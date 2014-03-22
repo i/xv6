@@ -12,7 +12,7 @@
 // the log (with commit record) to disk, then installs the affected
 // blocks to disk, then erases the log. begin_trans() ensures that
 // only one system call can be in a transaction; others must wait.
-// 
+//
 // Allowing only one transaction at a time means that the file
 // system code doesn't have to worry about the possibility of
 // one transaction reading a block that another one has modified,
@@ -34,7 +34,7 @@
 // Contents of the header block, used for both the on-disk header block
 // and to keep track in memory of logged sector #s before commit.
 struct logheader {
-  int n;   
+  int n;
   int sector[LOGSIZE];
 };
 
@@ -66,7 +66,7 @@ initlog(void)
 }
 
 // Copy committed blocks from log to their home location
-static void 
+static void
 install_trans(void)
 {
   int tail;
@@ -76,7 +76,7 @@ install_trans(void)
     struct buf *dbuf = bread(log.dev, log.lh.sector[tail]); // read dst
     memmove(dbuf->data, lbuf->data, BSIZE);  // copy block to dst
     bwrite(dbuf);  // write dst to disk
-    brelse(lbuf); 
+    brelse(lbuf);
     brelse(dbuf);
   }
 }
@@ -115,7 +115,7 @@ write_head(void)
 static void
 recover_from_log(void)
 {
-  read_head();      
+  read_head();
   install_trans(); // if committed, copy from log to disk
   log.lh.n = 0;
   write_head(); // clear the log
@@ -138,10 +138,10 @@ commit_trans(void)
   if (log.lh.n > 0) {
     write_head();    // Write header to disk -- the real commit
     install_trans(); // Now install writes to home locations
-    log.lh.n = 0; 
+    log.lh.n = 0;
     write_head();    // Erase the transaction from the log
   }
-  
+
   acquire(&log.lock);
   log.busy = 0;
   wakeup(&log);
@@ -149,7 +149,7 @@ commit_trans(void)
 }
 
 // Caller has modified b->data and is done with the buffer.
-// Append the block to the log and record the block number, 
+// Append the block to the log and record the block number,
 // but don't write the log header (which would commit the write).
 // log_write() replaces bwrite(); a typical use is:
 //   bp = bread(...)
