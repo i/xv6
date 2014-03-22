@@ -23,6 +23,9 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 
+typedef void (sighandler_t)(void);
+sighandler_t signal(int, sighandler_t);
+
 // ulib.c
 int stat(char*, struct stat*);
 char* strcpy(char*, char*);
