@@ -467,7 +467,6 @@ signal(int signum, sighandler_t handler)
   if (signum != 0 && signum != 1)
     return (sighandler_t)-1;
 
-  cprintf("Changing handler for %d to %p\n", signum, handler);
   old = proc->handlers[signum];
   proc->handlers[signum] = handler;
 

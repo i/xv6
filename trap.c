@@ -83,9 +83,10 @@ trap(struct trapframe *tf)
       cprintf("Default, killing process\n");
       proc->killed = 1;
     } else {
+      *(sighandler_t*)(proc->mem + proc->tf->esp - 4) =
+        (sighandler_t)proc->tf->eip;
       tf->esp -= 4;
       tf->eip = (uint)proc->handlers[SIGSEGV];
-      cprintf("going to 0x%p\n", proc->handlers[SIGSEGV]);
     }
     break;
   //PAGEBREAK: 13

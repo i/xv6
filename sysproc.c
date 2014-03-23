@@ -103,6 +103,5 @@ sys_signal(void)
   if(argfunc(1, &handler))
     return (sighandler_t)-1;
 
-  cprintf("Inside sys_signal. signum: %d, handler: %p\n", signum, handler);
   return signal(signum, handler);
 }
