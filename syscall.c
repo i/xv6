@@ -23,6 +23,16 @@ fetchint(uint addr, int *ip)
   return 0;
 }
 
+int
+fetchfunc(struct proc *p, uint addr, sighandler_t *fp)
+{
+  if(addr >= p->sz || addr+4 > p->sz)
+    return -1;
+  *fp = *(sighandler_t *)(p->mem + addr);
+  return 0;
+}
+
+
 // Fetch the nul-terminated string at addr from the current process.
 // Doesn't actually copy the string - just sets *pp to point at it.
 // Returns length of string, not including nul.
@@ -39,6 +49,12 @@ fetchstr(uint addr, char **pp)
     if(*s == 0)
       return s - *pp;
   return -1;
+}
+
+int
+argfunc(int n, sighandler_t *fp)
+{
+  return fetchfunc(proc, proc->tf->esp + 4 + 4*n, fp);
 }
 
 // Fetch the nth 32-bit system call argument.
@@ -63,6 +79,8 @@ argptr(int n, char **pp, int size)
   *pp = (char*)i;
   return 0;
 }
+
+
 
 // Fetch the nth word-sized system call argument as a string pointer.
 // Check that the pointer is valid and the string is nul-terminated.
@@ -99,6 +117,7 @@ extern int sys_unlink(void);
 extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
+extern int sys_test(void); // temp
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -122,7 +141,7 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_signal]  sys_signal,
+[SYS_signal]  sys_signal
 };
 
 void

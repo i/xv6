@@ -138,11 +138,18 @@ int             strlen(const char*);
 int             strncmp(const char*, const char*, uint);
 char*           strncpy(char*, const char*, int);
 
+#ifndef SIGACT
+#define SIGACT
+typedef void (*sighandler_t)(void);
+#endif
+
 // syscall.c
 int             argint(int, int*);
 int             argptr(int, char**, int);
+int             argfunc(int, sighandler_t*);
 int             argstr(int, char**);
 int             fetchint(uint, int*);
+int             fetchfunc(struct proc *, uint, sighandler_t*);
 int             fetchstr(uint, char**);
 void            syscall(void);
 

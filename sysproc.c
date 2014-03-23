@@ -89,15 +89,20 @@ sys_uptime(void)
   return xticks;
 }
 
-// updates the handler for signal
+
+// set custom signal handler
 // returns the previous signal handler
-int
+sighandler_t
 sys_signal(void)
 {
-  uint signum; // TODO get value off the stack
-  sighandler_t handler; // TODO get value off the stack
-  sighandler_t prev = proc->handlers[signum];
-  proc->handlers[signum] = handler; //
+  int signum;
+  sighandler_t handler;
 
-  return prev;
+  if (argint(0, &signum) < 0)
+    return (sighandler_t)-1;
+  if(argfunc(1, &handler))
+    return (sighandler_t)-1;
+
+  cprintf("Inside sys_signal. signum: %d, handler: %p\n", signum, handler);
+  return signal(signum, handler);
 }

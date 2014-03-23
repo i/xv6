@@ -154,8 +154,9 @@ fork(void)
       np->ofile[i] = filedup(proc->ofile[i]);
   np->cwd = idup(proc->cwd);
 
+  // Initialize signal handlers to KILL
   for (i = 0; i < NELEM(np->handlers); i++)
-    np->handlers[i] = -1;
+    np->handlers[i] = (sighandler_t)-1;
 
   pid = np->pid;
   np->state = RUNNABLE;
@@ -459,4 +460,16 @@ procdump(void)
   }
 }
 
+sighandler_t
+signal(int signum, sighandler_t handler)
+{
+  sighandler_t old;
+  if (signum != 0 && signum != 1)
+    return (sighandler_t)-1;
 
+  cprintf("Changing handler for %d to %p\n", signum, handler);
+  old = proc->handlers[signum];
+  proc->handlers[signum] = handler;
+
+  return old;
+}

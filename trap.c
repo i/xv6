@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "x86.h"
 #include "traps.h"
+#include "signals.h"
 #include "spinlock.h"
 
 // Interrupt descriptor table (shared by all CPUs).
@@ -77,7 +78,16 @@ trap(struct trapframe *tf)
             cpu->id, tf->cs, tf->eip);
     lapiceoi();
     break;
-
+  case T_PGFLT:
+    if ((int)proc->handlers[SIGSEGV] == -1) {
+      cprintf("Default, killing process\n");
+      proc->killed = 1;
+    } else {
+      tf->esp -= 4;
+      tf->eip = (uint)proc->handlers[SIGSEGV];
+      cprintf("going to 0x%p\n", proc->handlers[SIGSEGV]);
+    }
+    break;
   //PAGEBREAK: 13
   default:
     if(proc == 0 || (tf->cs&3) == 0){

@@ -22,8 +22,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int test(void);
 
-typedef void (sighandler_t)(void);
+typedef void (*sighandler_t)(void);
 sighandler_t signal(int, sighandler_t);
 
 // ulib.c
